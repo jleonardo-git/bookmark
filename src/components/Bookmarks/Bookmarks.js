@@ -5,10 +5,16 @@ import Bookmark from "./Bookmark/Bookmark";
 import useStyles from "./styles";
 
 const Bookmarks = ({ setCurrentId }) => {
-  const bookmarks = useSelector((state) => state.bookmarks);
+  const user = useSelector((state) => state.session);
+  const bookmarks = useSelector((state) => state.bookmarks)?.filter((b) => {
+    if (user?.id !== 3) {
+      return b?.creatorUserId === user?.id;
+    }
+    return user;
+  });
   const classes = useStyles();
 
-  return !bookmarks.length ? (
+  return !bookmarks?.length ? (
     <CircularProgress />
   ) : (
     <Grid
@@ -19,7 +25,11 @@ const Bookmarks = ({ setCurrentId }) => {
     >
       {bookmarks.map((bookmark) => (
         <Grid key={bookmark?.id} item xs={12} sm={6} md={6}>
-          <Bookmark bookmark={bookmark} setCurrentId={setCurrentId} />
+          <Bookmark
+            key={bookmark?.id}
+            bookmark={bookmark}
+            setCurrentId={setCurrentId}
+          />
         </Grid>
       ))}
     </Grid>

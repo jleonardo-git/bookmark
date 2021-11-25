@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 
 import {
@@ -24,9 +24,15 @@ import { getCategories, createCategory } from "../../actions/categories";
 
 const Form = ({ currentId, setCurrentId }) => {
   const bookmarkData = useSelector((state) =>
-    state.bookmarks.find((b) => b?.id === currentId)
+    state?.bookmarks?.find((b) => b?.id === currentId)
   );
-  const categories = useSelector((state) => state.categories);
+  const user = useSelector((state) => state.session);
+  const categories = useSelector((state) => state.categories)?.filter((c) => {
+    if (user?.id !== 3) {
+      return c?.creatorUserId === user?.id;
+    }
+    return user;
+  });
   const [bookmark, setBookmark] = useState({
     url: "",
     shortDescription: "",
@@ -39,14 +45,23 @@ const Form = ({ currentId, setCurrentId }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
+  const usePrevoius = (value) => {
+    const ref = useRef();
+    useEffect(() => {
+      ref.current = value;
+    });
+    return ref.current;
+  };
+  const prevCat = usePrevoius(categories);
+  const prevData = usePrevoius(bookmarkData);
   useEffect(() => {
-    if (bookmarkData) {
+    if (prevData !== bookmarkData) {
       setBookmark(bookmarkData);
     }
-    if (categories) {
+    if (prevCat?.length !== categories?.length) {
       dispatch(getCategories());
     }
-  }, [bookmarkData, categories]);
+  }, [bookmarkData, categories, prevData, prevCat, dispatch]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -105,7 +120,7 @@ const Form = ({ currentId, setCurrentId }) => {
           variant="outlined"
           label="URL"
           fullWidth
-          value={bookmark.url}
+          value={bookmark?.url}
           onChange={handleChange}
         />
         <TextField
@@ -113,7 +128,7 @@ const Form = ({ currentId, setCurrentId }) => {
           variant="outlined"
           label="Short Description"
           fullWidth
-          value={bookmark.shortDescription}
+          value={bookmark?.shortDescription}
           onChange={handleChange}
         />
         <FormControl className={classes.select} fullWidth>
@@ -125,7 +140,7 @@ const Form = ({ currentId, setCurrentId }) => {
             variant="outlined"
             labelId="categories"
             id="categories-select"
-            value={bookmark.categoryId}
+            value={bookmark?.categoryId}
             label="Category"
             fullWidth
             onChange={handleChange}
@@ -156,7 +171,7 @@ const Form = ({ currentId, setCurrentId }) => {
               name="name"
               variant="outlined"
               label="Create New Category"
-              value={category.name}
+              value={category?.name}
               autoComplete="off"
               onChange={handleChangeCategory}
             />

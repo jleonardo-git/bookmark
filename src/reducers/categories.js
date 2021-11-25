@@ -1,8 +1,10 @@
+import * as c from "../constants/actionTypes";
+
 export default (categories = [], action) => {
   switch (action.type) {
-    case "GET_CATEGORIES":
+    case c.GET_CATEGORIES:
       return action.payload?.result?.items;
-    case "CREATE_CATEGORY":
+    case c.CREATE_CATEGORY:
       return [...categories, action.payload];
 
     default:

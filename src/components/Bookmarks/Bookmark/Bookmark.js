@@ -28,7 +28,12 @@ const Bookmark = ({ bookmark, setCurrentId }) => {
 
   return (
     <Card className={classes.card}>
-      <iframe width="330" height="315" src={bookmark.url}></iframe>
+      <iframe
+        title={bookmark.shortDescription}
+        width="330"
+        height="315"
+        src={bookmark?.url}
+      ></iframe>
       <CardContent>
         <Typography variant="h6" gutterBottom>
           {bookmark?.shortDescription}
